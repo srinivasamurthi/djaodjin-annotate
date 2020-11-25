@@ -170,7 +170,7 @@ MIT License
                     });
                 }
             }
-            self.$textbox = $('<textarea id=""' +
+            self.$textbox = $('<textarea id="txtbox"' +
                 ' style="position:absolute;z-index:100000;display:none;top:0;left:0;' +
                 'background:transparent;border:1px dotted; line-height:25px;' +
                 ';font-size:' + self.fontsize +
@@ -589,8 +589,10 @@ MIT License
                     self.storedElement.push({
                         type: 'text',
                         text: text,
-                        fromx: (self.fromx - offset.left) * self.compensationWidthRate,
-                        fromy: (self.fromy - offset.top) * self.compensationWidthRate,
+                        //fromx: (self.fromx - offset.left) * self.compensationWidthRate,
+                        //fromy: (self.fromy - offset.top) * self.compensationWidthRate,
+                        fromx: (self.fromx) * self.compensationWidthRate,
+                        fromy: (self.fromy) * self.compensationWidthRate,
                         maxwidth: self.tox
                     });
                     if (self.storedUndo.length > 0) {
@@ -661,8 +663,10 @@ MIT License
                         self.$textbox.css({
                             left: self.fromx + 2,
                             top: self.fromy,
-                            width: self.tox,
-                            height: self.toy
+                            //width: self.tox,
+                           // height: self.toy
+                            width: self.tox - (self.fromx + 2) - 5,
+                           height: self.toy - (self.fromy) - 5
                         });
                         break;
                     case 'pen':
@@ -697,9 +701,10 @@ MIT License
                 });
             }
         },
-        annotateleave: function(event) {
+        annotateleave: function (event) {
             var self = this;
             if (self.clicked) {
+                //if (event.relatedTarget && event.relatedTarget.id !== "txtbox")
                 self.annotatestop(event);
             }
         },
@@ -751,8 +756,8 @@ MIT License
                     self.$textbox.css({
                         left: self.fromx + 2,
                         top: self.fromy,
-                        width: self.tox,
-                        height: self.toy
+                        width: self.tox - (self.fromx + 2) - 5,
+                        height: self.toy - (self.fromy) - 5
                     });
                     break;
                 case 'circle':
