@@ -360,11 +360,11 @@ MIT License
                 self.baseCanvas.width = self.drawingCanvas.width = self.currentWidth;
                 self.baseCanvas.height = self.drawingCanvas.height = self.currentHeight;
                 self.baseContext.drawImage(self.img, 0, 0, self.currentWidth,
-                    self.currentHeight);
+                    self.currentHeight);                
                 self.$el.css({
                     height: self.currentHeight,
                     width: self.currentWidth
-                });
+                });                
                 self.storedElement = image.storedElement;
                 self.storedUndo = image.storedUndo;
                 self.selectedImage = image.id;
@@ -811,7 +811,11 @@ MIT License
             if (callback) {
                 callback(image);
             }
-            self.options.onExport(image);
+            var returnData = {
+                image: image,
+                type : exportDefaults.type
+            }
+            self.options.onExport(returnData);
         },
         clearAnnotations: function() {
             var self = this;

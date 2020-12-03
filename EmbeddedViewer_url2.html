@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Embedded Viewer</title>
+
+    <link rel="stylesheet" type="text/css" href="annotation/annotate.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.js"></script> <!--load all styles -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" rel="stylesheet" /> <!--load all styles -->
+
+    <style>
+        .viewer {
+            //border: 2px red solid;
+            width: 600px;
+            height: 400px;
+            z-index: 1;
+            position:absolute;
+            top : 50px;
+            left : 50px;
+        }
+        .vctIframe
+        {
+            width:100%;
+            height:100%;
+        }
+        .snipper {
+	        /* border: 2px red solid;*/
+	        width: 600px;
+            height: 400px;
+            position:absolute;
+            top : 50px;
+            left : 50px;
+            z-index: 9;
+            display:none
+        }
+        .myCanvas {
+	        width: 100%;
+            height: calc(100% - 40px);         
+            }
+        .tools {
+	        width: 100%;
+            height: 40px;
+            display:flex;
+            background:rgba(00, 00, 00, 1);
+            align-items: center;
+            justify-content: center;
+            color:white;
+            }
+            
+        .btnAnnotate
+        {
+            width:32px;
+            height:32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+			margin: 2px;
+			border-radius:10px;	
+			border:0px;
+				
+        }
+
+
+        .input-group {
+	        width: 100%;
+            height: 40px;
+            display:flex;
+            background:rgba(00, 00, 00, 1);
+            align-items: center;
+            justify-content: center;
+            color:white;
+            }
+        .text-group-field {
+            padding-right: 3px;
+        }
+        .radio-custom {
+            display: none;
+        }
+
+        .radio-custom-label {
+            padding-top: 5px;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-bottom: 5px;
+            border:2px solid white;  
+			border-radius:10px;			
+        }
+
+        .radio-custom:checked ~ label {
+			color: #404ed0;
+			border:2px solid #404ed0; 
+			border-radius:10px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div id="viewer" class="viewer">
+    <iframe name="vctIframe" id="vctIframe"  class="vctIframe" src="index.html?GUI=true&file=samples/beam.wcax" seamless="seamless"
+         frameborder="0" allowfullscreen="allowfullscreen"></iframe>  
+    </div>
+    <br />
+    <br />
+    <div id="snipper" class="snipper">
+        <div id="tools" class="tools">            
+            <div class="input-group">
+
+            <button id="exportaction" title="Export" class="annotateexport btnAnnotate"><i class="fas fa-download"></i></button>
+            <button id="undoaction" title="Undo" class="annotateundo btnAnnotate"><i class="fas fa-undo"></i></button>
+
+            &nbsp;  &nbsp;
+
+			<div class="text-group-field">
+			  <div class="inner-block">
+				<input type="radio" id="rdoNoTool"  class="radio-custom input-group-field" name="tool_option" value="NO TOOL SELECTED" checked="checked"  data-tool="null"  />
+				<label for="rdoNoTool" class="radio-custom-label" ><i class="fas fa-mouse-pointer"></i></label>
+			  </div>
+			</div>
+			<div class="text-group-field">
+				<div class="inner-block">
+					<input type="radio" id="rdoRect" class="radio-custom input-group-field" name="tool_option" value="RECTANGLE" data-tool="rectangle"  />
+					<label for="rdoRect" class="radio-custom-label" ><i class="fas fa-square"></i></label>
+				</div>
+			</div>
+			<div class="text-group-field">
+				<div class="inner-block">
+					<input type="radio" id="rdoCircle" class="radio-custom input-group-field" name="tool_option" value="CIRCLE" data-tool="circle" />
+					<label for="rdoCircle" class="radio-custom-label"><i class="fas fa-circle"></i></label>
+				</div>
+			</div>
+			<div class="text-group-field">                    
+				<div class="inner-block">
+					<input type="radio" id="rdotxt" class="radio-custom input-group-field"  name="tool_option" value="TEXT" data-tool="text" />
+					<label for="rdotxt" class="radio-custom-label" ><i class="fas fa-font"></i></label>
+				</div>
+			  </div>
+			<div class="text-group-field">                    
+				<div class="inner-block">
+					<input type="radio" id="rdoArrow" class="radio-custom input-group-field" name="tool_option" value="ARROW" data-tool="arrow" />
+					<label for="rdoArrow" class="radio-custom-label" ><i class="fas fa-long-arrow-alt-right"></i></label>
+				</div>
+			  </div>
+			<div class="text-group-field">                    
+					<div class="inner-block">
+						<input type="radio" id="rdoPen" class="radio-custom input-group-field" name="tool_option" value="PEN" data-tool="pen" />
+						<label for="rdoPen" class="radio-custom-label" ><i class="fas fa-pen"></i></label> 
+					</div>
+				</div>
+
+			&nbsp;   &nbsp;
+            <button id="redoaction" title="Redo" class="annotateredo btnAnnotate"><i class="fas fa-redo"></i></button>
+            <button id="exitaction" title="Exit" class="annotateexit btnAnnotate"><i class="fas fa-sign-out-alt"></i></button>
+                
+            </div>
+        </div>
+        <div id="myCanvas" class="myCanvas"></div>
+    </div>    
+    <script type="text/javascript" src="annotation/jquery.js"></script>
+	<script type="text/javascript" src="annotation/djaodjin-annotate.js"></script>  
+
+    <script>
+
+        //var iframwnd = document.getElementById('vctIframe').contentWindow;
+
+        if (window.addEventListener) {
+            window.addEventListener('message', handleMessage, false);
+        } else if (window.attachEvent) { // ie8
+            window.attachEvent('onmessage', handleMessage);
+        }
+
+
+        function handleMessage(e) {
+
+            //console.log(e);
+            //console.log(e.origin);
+            //console.log(e.data);
+            //console.log(e.source);
+            //$("#myCanvas").annotate("push", "images/img/audi_VP1.jpg");
+            $("#myCanvas").annotate("clear", {});
+            var img = new Image();
+            img.src = e.data.imageData;
+            var onImgLoad = function () {
+                $("#snipper").show();
+                var width = document.getElementById("snipper").clientWidth;
+                var height = document.getElementById("snipper").clientHeight;
+                var toolsHeight = document.getElementById("tools").clientHeight;
+                height = height - toolsHeight;
+                var dataURI = imageToDataUri(this, width, height);
+                $("#myCanvas").annotate("push", { id: "vctImage1", path: dataURI, isDataURL: true });
+               
+            }
+            img.onload = onImgLoad;
+       
+        }
+
+
+        var options = {
+            width: null,          // Width of canvas
+            height: null,         // Height of canvas
+            color: "red",           // Color for shape and text
+            type: null,    // default shape: can be "rectangle", "arrow" or "text"
+            images: [],          // Array of images path : ["images/image1.png", "images/image2.png"]
+            linewidth: 2,           // Line width for rectangle and arrow shapes
+            fontsize: "20px",       // font size for text
+            bootstrap: false,       // Bootstrap theme design
+            position: "top",       // Position of toolbar (available only with bootstrap)
+            selectEvent: "change", // listened event on .annotate-image-select selector to select active images
+            unselectTool: true,   // Add a unselect tool button in toolbar (useful in mobile to enable zoom/scroll)
+            onExport: onExport,            
+            onRedraw: function (self) { },
+            useOwnTemplate: true,
+            toolboxId: "tools"
+        }
+
+        function onExport(data) {
+            //console.log(data);
+            //window.open(data);
+            //$("#snipper").hide();
+
+
+            var blob = dataURLtoBlob(data.image);
+            window.open(URL.createObjectURL(blob), "_blank");
+        }
+
+
+        function dataURLtoBlob(dataurl) {
+            var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }    
+
+        function imageToDataUri(img, width, height) {
+
+            // create an off-screen canvas
+            var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
+
+            // set its dimension to target size
+            canvas.width = width;
+            canvas.height = height;
+
+            // draw source image into the off-screen canvas:
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // encode image to data-uri with base64 version of compressed image
+            return canvas.toDataURL();
+        }
+
+        $(document).ready(function () {
+            $('#myCanvas').annotate(options);
+
+            var exportOptions = {
+                type: "image/jpeg",	// ex: "image/png"
+                quality: 1		// Available only for "image/jpeg"
+            };
+            $("#exportaction").click(function () {
+                $("#myCanvas").annotate("export", exportOptions);
+            });
+
+            $("#exitaction").click(function () {
+                $("#snipper").hide();
+            });
+        });
+    </script>
+</body>
+</html>
